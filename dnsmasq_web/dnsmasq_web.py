@@ -23,9 +23,11 @@ class DnsmasqWeb:
             )
 
     async def get_leases(self, server_request):
-        with open('host/dnsmasq.leases') as f:
-            leases = f.readlines()
-
+        try:
+            with open('host/dnsmasq.leases') as f:
+                leases = f.readlines()
+        except FileNotFoundError:
+            return web.Response(text="[]")
         leases = [l.split(" ") for l in leases]
         leases = [
             {

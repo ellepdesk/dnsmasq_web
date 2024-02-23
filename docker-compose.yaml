@@ -1,0 +1,12 @@
+version: "3"
+services:
+  goodwe:
+    container_name: dnsmasq-web
+    build: https://github.com/ellepdesk/dnsmasq_web.git#main
+    pull_policy: build
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      LOGLEVEL: INFO
+    volumes:
+      - /var/lib/misc/dnsmasq.leases:/app/host/dnsmasq.leases:ro

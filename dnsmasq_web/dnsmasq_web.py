@@ -3,6 +3,11 @@ from aiohttp import web
 from airium import Airium
 from datetime import datetime
 import json
+import os
+import logging
+
+port = os.environ.get('PORT', 8080)
+loglevel = os.environ.get('LOGLEVEL', 'INFO')
 
 class DnsmasqWeb:
     def __init__(self):
@@ -37,12 +42,15 @@ class DnsmasqWeb:
         )
 
 if __name__ == "__main__":
+    logging.basicConfig(format='%(asctime)s %(name)s:%(levelname)s:%(message)s', level=loglevel)
+
     async def main():
         try:
+            logging.info("starting webserver ...")
             dnsmasqweb = DnsmasqWeb()
             runner = web.AppRunner(dnsmasqweb.app)
             await runner.setup()
-            site = web.TCPSite(runner, port=8080)
+            site = web.TCPSite(runner, port=port)
             await site.start()
 
             while True:

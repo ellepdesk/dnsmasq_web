@@ -1,6 +1,5 @@
 import asyncio
 from aiohttp import web
-from airium import Airium
 from datetime import datetime
 import json
 import os
@@ -27,7 +26,7 @@ class DnsmasqWeb:
             with open('host/dnsmasq.leases') as f:
                 leases = f.readlines()
         except FileNotFoundError:
-            return web.Response(text="[]")
+            leases = []
         leases = [l.split(" ") for l in leases]
         leases = [
             {

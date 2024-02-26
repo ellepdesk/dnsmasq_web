@@ -26,7 +26,7 @@ class DnsmasqWeb:
             with open('host/dnsmasq.leases') as f:
                 leases = f.readlines()
         except FileNotFoundError:
-            return web.Response(text="[]")
+            leases = []
         leases = [l.split(" ") for l in leases]
         leases = [
             {

@@ -1,6 +1,5 @@
 import asyncio
 from aiohttp import web
-from airium import Airium
 from datetime import datetime
 import json
 import os

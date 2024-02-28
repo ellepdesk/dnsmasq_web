@@ -18,7 +18,7 @@ class DnsmasqWeb:
 
     async def get_index(self, server_request):
         return web.FileResponse(
-            "static/index.html",
+            "./static/index.html",
             )
 
     async def get_leases(self, server_request):
@@ -44,7 +44,7 @@ class DnsmasqWeb:
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s %(name)s:%(levelname)s:%(message)s', level=loglevel)
-
+    # os.chdir("./dnsmasq_web")
     async def main():
         try:
             logging.info("starting webserver ...")

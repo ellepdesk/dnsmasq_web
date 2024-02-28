@@ -15,7 +15,6 @@ RUN pip install /tmp/*.whl
 COPY dnsmasq_web/*.py ./
 COPY dnsmasq_web/static ./static
 RUN mkdir -p host
-# run as user and group 1000
 
 # start script
 CMD [ "python3", "dnsmasq_web.py"]

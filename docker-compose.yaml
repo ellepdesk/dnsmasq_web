@@ -1,6 +1,6 @@
 version: "3"
 services:
-  goodwe:
+  dnsmasq-web:
     container_name: dnsmasq-web
     build: https://github.com/ellepdesk/dnsmasq_web.git#main
     pull_policy: build

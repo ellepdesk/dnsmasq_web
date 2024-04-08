@@ -31,10 +31,11 @@
       data-url="leases">
       <thead>
         <tr>
-          <th data-field="ip">IP address</th>
-          <th data-field="name">Name</th>
-          <th data-field="mac">MAC address</th>
-          <th data-field="expires">expires</th>
+          <th data-sortable="true" data-field="ip" data-formatter="ReachableFormatter">IP address</th>
+          <th data-sortable="true" data-field="name">Name</th>
+          <th data-sortable="true" data-field="mac">MAC address</th>
+          <th data-sortable="true" data-field="expires">Expires</th>
+          <!-- <th data-sortable="true" data-field="clientid">Client ID</th> -->
         </tr>
       </thead>
     </table>
@@ -47,6 +48,26 @@
   </footer>
 </div>
 
+<script>
+  function ReachableFormatter(value, row, index) {
+  // Try to fetch from ip as it it were a web page over http and https
+  fetch('http://'+row.ip, {mode: 'no-cors'}).then(r=>{
+    // When site looks like a web page, convert the data to a clickable link
+    $("td").filter(function (index) { return $(this).text() == row.ip; }).html("<a href='http://"+row.ip+"'>"+row.ip+"</a>")
+  })
+  .catch(e=>{
+    });
+  fetch('https://'+row.ip, {mode: 'no-cors'}).then(r=>{
+    // When site looks like a web page, convert the data to a clickable link
+    $("td").filter(function (index) { return $(this).text() == row.ip; }).html("<a href='https://"+row.ip+"'>"+row.ip+"</a>")
+  })
+  .catch(e=>{
+    });
+  // Return value as 'formatted' data until fetch is finished
+  return value
+}
+
+</script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

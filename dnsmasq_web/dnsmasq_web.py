@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # os.chdir("./dnsmasq_web")
     async def main():
         try:
-            logging.info("starting webserver ...")
+            logging.info(f"starting webserver at http://localhost:{port}")
             dnsmasqweb = DnsmasqWeb()
             runner = web.AppRunner(dnsmasqweb.app)
             await runner.setup()

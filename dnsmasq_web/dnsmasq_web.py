@@ -34,6 +34,7 @@ class DnsmasqWeb:
                 "mac": parts[1],
                 "ip": parts[2],
                 "name": parts[3],
+                "clientid": parts[4],
             }
             for parts in leases
             ]

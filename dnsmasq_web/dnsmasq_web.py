@@ -37,11 +37,40 @@ class DnsmasqWeb:
                 "clientid": parts[4],
             }
             for parts in leases
-            ]
+        ]
+        ip_addresses = [p["ip"] for p in leases]
+        open_ports = await scan_ports(ip_addresses)
+        for l in leases:
+            l["open_ports"] = open_ports.get(l["ip"],[])
         response = json.dumps(leases, indent=2)
         return web.Response(
             text=response
         )
+
+async def test_connect(ip, port):
+    try:
+        _, _ = await asyncio.wait_for(asyncio.open_connection(ip, port), timeout=1)
+        return (ip, port, True)
+    except (OSError, asyncio.TimeoutError):
+        return (ip, port, False)
+
+
+async def scan_ports(ipaddresses):
+    tasks = []
+    for ip in ipaddresses:
+        tasks += [
+            test_connect(ip, 22),
+            test_connect(ip, 80),
+            test_connect(ip, 443)
+        ]
+    result = await asyncio.gather(*tasks)
+    res = {}
+    for (ip, port, is_open) in result:
+        if is_open:
+            res[ip] = res.get(ip, [])
+            res[ip].append(port)
+    return res
+
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s %(name)s:%(levelname)s:%(message)s', level=loglevel)

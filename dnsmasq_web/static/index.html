@@ -31,7 +31,8 @@
       data-url="leases">
       <thead>
         <tr>
-          <th data-sortable="true" data-field="ip" data-formatter="ReachableFormatter">IP address</th>
+          <th data-sortable="true" data-field="ip">IP address</th>
+          <th data-sortable="true" data-field="open_ports" data-formatter="PortFormatter">Port</th>
           <th data-sortable="true" data-field="name">Name</th>
           <th data-sortable="true" data-field="mac">MAC address</th>
           <th data-sortable="true" data-field="expires">Expires</th>
@@ -49,22 +50,20 @@
 </div>
 
 <script>
-  function ReachableFormatter(value, row, index) {
-  // Try to fetch from ip as it it were a web page over http and https
-  fetch('http://'+row.ip, {mode: 'no-cors'}).then(r=>{
-    // When site looks like a web page, convert the data to a clickable link
-    $("td").filter(function (index) { return $(this).text() == row.ip; }).html("<a href='http://"+row.ip+"'>"+row.ip+"</a>")
-  })
-  .catch(e=>{
-    });
-  fetch('https://'+row.ip, {mode: 'no-cors'}).then(r=>{
-    // When site looks like a web page, convert the data to a clickable link
-    $("td").filter(function (index) { return $(this).text() == row.ip; }).html("<a href='https://"+row.ip+"'>"+row.ip+"</a>")
-  })
-  .catch(e=>{
-    });
-  // Return value as 'formatted' data until fetch is finished
-  return value
+  function PortFormatter(value, row, index) {
+  r = ""
+  for (v of value) {
+    if (v == 22){
+      r += "<a href='ssh://"+row.ip+"'>ssh</a>";
+    }
+   if (v == 80){
+      r += "<a href='http://"+row.ip+"'>http</a>";
+    }
+   if (v == 443){
+      r += "<a href='https://"+row.ip+"'>https</a>";
+    }
+  }
+  return r
 }
 
 </script>

@@ -8,6 +8,21 @@ import logging
 port = os.environ.get('PORT', 8080)
 loglevel = os.environ.get('LOGLEVEL', 'INFO')
 
+
+def _parse_lease_lines(leases):
+    for line in leases:
+        parts = line.split(" ")
+        try:
+            yield {
+                "expires": datetime.fromtimestamp(int(parts[0])).isoformat(),
+                "mac": parts[1],
+                "ip": parts[2],
+                "name": parts[3],
+                "clientid": parts[4],
+            }
+        except (ValueError, IndexError):
+            pass
+
 class DnsmasqWeb:
     def __init__(self):
         self.app = web.Application()
@@ -27,17 +42,7 @@ class DnsmasqWeb:
                 leases = f.readlines()
         except FileNotFoundError:
             leases = []
-        leases = [l.split(" ") for l in leases]
-        leases = [
-            {
-                "expires": datetime.fromtimestamp(int(parts[0])).isoformat(),
-                "mac": parts[1],
-                "ip": parts[2],
-                "name": parts[3],
-                "clientid": parts[4],
-            }
-            for parts in leases
-        ]
+        leases = list(_parse_lease_lines(leases))
         ip_addresses = [p["ip"] for p in leases]
         open_ports = await scan_ports(ip_addresses)
         for l in leases:

@@ -28,8 +28,7 @@ class DnsmasqWeb:
         self.app = web.Application()
         self.app.add_routes([web.get("/leases", self.get_leases)])
         self.app.add_routes([web.get("/", self.get_index)])
-    pass
-
+        self.app.add_routes([web.static('/static', './static')])
 
     async def get_index(self, server_request):
         return web.FileResponse(

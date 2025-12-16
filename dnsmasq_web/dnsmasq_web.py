@@ -3,6 +3,7 @@ from aiohttp import web
 from datetime import datetime
 import json
 import os
+from pathlib import Path
 import logging
 
 port = os.environ.get('PORT', 8080)
@@ -23,34 +24,46 @@ def _parse_lease_lines(leases):
         except (ValueError, IndexError):
             pass
 
+
 class DnsmasqWeb:
     def __init__(self):
         self.app = web.Application()
-        self.app.add_routes([web.get("/leases", self.get_leases)])
+        self.app.add_routes([web.get("/leases", self.get_leases_all)])
         self.app.add_routes([web.get("/", self.get_index)])
-    pass
-
+        self.app.add_routes([web.static('/static', './static')])
 
     async def get_index(self, server_request):
         return web.FileResponse(
             "./static/index.html",
             )
 
-    async def get_leases(self, server_request):
-        try:
-            with open('host/dnsmasq.leases') as f:
-                leases = f.readlines()
-        except FileNotFoundError:
-            leases = []
+    async def get_leases_all(self, server_request):
+        leases = []
+        for path in Path('host/').glob('*.leases'):
+            logging.info(f"reading file: {path}")
+            try:
+                with open(path) as f:
+                    l = f.readlines()
+            except FileNotFoundError:
+                l = []
+
+            file_leases = await self.parse_leases(l)
+            leases += file_leases
+
+
+        response = json.dumps(leases, indent=2)
+        return web.Response(
+            text=response
+        )
+
+    async def parse_leases(self, leases):
         leases = list(_parse_lease_lines(leases))
         ip_addresses = [p["ip"] for p in leases]
         open_ports = await scan_ports(ip_addresses)
         for l in leases:
             l["open_ports"] = open_ports.get(l["ip"],[])
-        response = json.dumps(leases, indent=2)
-        return web.Response(
-            text=response
-        )
+        return leases
+
 
 async def test_connect(ip, port):
     try:
